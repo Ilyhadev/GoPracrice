@@ -1,5 +1,17 @@
-FROM golang:alpine
+FROM golang:alpine AS builder
+
 WORKDIR /build
-COPY src/main.go .
-RUN go build -o hello main.go
-CMD [". /hello"]
+
+ADD src/go.mod .
+
+COPY . .
+
+RUN go build -o aStar src/main.go
+
+FROM alpine
+
+WORKDIR /build
+
+COPY --from=builder /build/aStar /build/aStar
+
+CMD [". /aStar"]
